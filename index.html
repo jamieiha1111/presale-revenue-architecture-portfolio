@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Presale Revenue Architecture — Portfolio Case Study · Jamie Iha</title>
+<style>
+  :root {
+    --bg: #f5f2ee;
+    --surface: #ede9e3;
+    --surface-2: #e6e0d8;
+    --card: #eee9e2;
+    --border: #d9d2c8;
+    --text: #2a2520;
+    --text-muted: #6b625a;
+    --text-light: #9c9189;
+    --accent: #8c6a5a;
+    --accent-light: #c4a698;
+    --accent-bg: #f0e8e2;
+    --heading-font: 'Georgia', 'Times New Roman', serif;
+    --body-font: 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
+    --label-font: -apple-system, 'Helvetica Neue', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body-font);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Layout ─── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  /* ─── Hero ─── */
+  .hero {
+    padding: 80px 0 72px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-family: var(--label-font);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: var(--heading-font);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: normal;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 640px;
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .tag {
+    font-family: var(--label-font);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-light);
+    border-radius: 3px;
+    padding: 5px 11px;
+  }
+
+  .confidentiality-note {
+    font-family: var(--label-font);
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border-left: 3px solid var(--accent-light);
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    max-width: 620px;
+    line-height: 1.6;
+  }
+
+  /* ─── Section headings ─── */
+  .section-label {
+    font-family: var(--label-font);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 32px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2 {
+    font-family: var(--heading-font);
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: normal;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-family: var(--heading-font);
+    font-size: 1.1rem;
+    font-weight: normal;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 700; color: var(--text); }
+
+  /* ─── At a Glance cards ─── */
+  .glance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .glance-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 18px;
+  }
+
+  .glance-label {
+    font-family: var(--label-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .glance-value {
+    font-family: var(--heading-font);
+    font-size: 1.05rem;
+    font-weight: normal;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .glance-sub {
+    font-family: var(--label-font);
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  /* ─── Analysis grid ─── */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .analysis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .analysis-dot {
+    width: 6px;
+    height: 6px;
+    min-width: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 8px;
+  }
+
+  .analysis-text {
+    font-family: var(--label-font);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ─── Insight callout ─── */
+  .insight-callout {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-light);
+    border-radius: 6px;
+    padding: 32px 36px;
+    margin: 32px 0;
+  }
+
+  .insight-callout p {
+    font-family: var(--heading-font);
+    font-size: 1.15rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 0;
+  }
+
+  .insight-callout p + p { margin-top: 14px; }
+
+  /* ─── Buyer question list ─── */
+  .question-list {
+    list-style: none;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .question-list li {
+    font-family: var(--label-font);
+    font-size: 14px;
+    color: var(--text-muted);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-left: 3px solid var(--accent-light);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .question-list li::before {
+    content: '→ ';
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ─── Skills grid ─── */
+  .skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .skill-tag {
+    font-family: var(--label-font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 13px;
+  }
+
+  /* ─── Constraint callout ─── */
+  .constraint-block {
+    text-align: center;
+    padding: 40px 20px;
+    margin: 28px 0;
+  }
+
+  .constraint-block .constraint-text {
+    font-family: var(--heading-font);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-style: italic;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  /* ─── Companion CTA ─── */
+  .companion-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .companion-label {
+    font-family: var(--label-font);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .companion-title {
+    font-family: var(--heading-font);
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .companion-desc {
+    font-family: var(--label-font);
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 420px;
+    line-height: 1.55;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--label-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    padding: 11px 22px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.18s, color 0.18s;
+  }
+
+  .btn:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ─── Impact list ─── */
+  .impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .impact-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 5px;
+    border: 1px solid var(--border);
+  }
+
+  .impact-icon {
+    font-size: 15px;
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  .impact-text {
+    font-family: var(--label-font);
+    font-size: 13.5px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  /* ─── Takeaway ─── */
+  .takeaway {
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 40px 40px;
+    border: 1px solid var(--border);
+  }
+
+  .takeaway p {
+    font-family: var(--heading-font);
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  /* ─── Footer ─── */
+  footer {
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  footer p {
+    font-family: var(--label-font);
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 0;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 600px) {
+    section { padding: 52px 0; }
+    .hero { padding: 56px 0 52px; }
+    .insight-callout { padding: 24px 22px; }
+    .companion-card { flex-direction: column; }
+    .takeaway { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<div class="hero">
+  <div class="container">
+    <p class="eyebrow">Portfolio Case Study · Revenue Strategy &amp; Business Operations</p>
+    <h1>Presale Revenue Architecture<br><em>Diagnosing Conversion Friction in a High-Value Sales Environment</em></h1>
+    <p class="hero-subtitle">A confidential revenue strategy case study on diagnosing conversion friction, sales pacing risk, and buyer decision misalignment in a high-value pre-construction sales environment.</p>
+    <div class="tags">
+      <span class="tag">Revenue Strategy</span>
+      <span class="tag">Business Operations</span>
+      <span class="tag">Sales Analytics</span>
+      <span class="tag">UX Research</span>
+      <span class="tag">Decision Architecture</span>
+    </div>
+    <div class="confidentiality-note">
+      Confidential case study. Company names, project details, financial figures, timelines, location details, and identifying information have been modified or generalized.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ AT A GLANCE ═══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">Project at a Glance</p>
+    <div class="glance-grid">
+      <div class="glance-card">
+        <div class="glance-label">Project type</div>
+        <div class="glance-value">Confidential revenue strategy</div>
+        <div class="glance-sub">Business diagnosis</div>
+      </div>
+      <div class="glance-card">
+        <div class="glance-label">Market context</div>
+        <div class="glance-value">High-value pre-construction purchase</div>
+        <div class="glance-sub">Major coastal urban market</div>
+      </div>
+      <div class="glance-card">
+        <div class="glance-label">Core issue</div>
+        <div class="glance-value">Sales activity not converting proportionally</div>
+        <div class="glance-sub">Structural, not promotional</div>
+      </div>
+      <div class="glance-card">
+        <div class="glance-label">Key output</div>
+        <div class="glance-value">Decision framework</div>
+        <div class="glance-sub">Later informed interactive buyer tool</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ BUSINESS CONTEXT ═══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">Business Context</p>
+    <p>A large-scale pre-construction residential project was operating with strong marketing activity, consistent buyer engagement, and a premium product narrative. By most surface-level measures, demand appeared healthy — thousands of sales and marketing touchpoints, event-based marketing campaigns, and a well-resourced sales operation.</p>
+    <p>But conversion and revenue pacing were not keeping up with the level of effort. The gap between activity and results was widening.</p>
+    <p>The organization could have treated this as a marketing problem — and in many ways, it was framed that way internally. But the deeper issue was structural: <strong>buyers were not evaluating this as a standard real estate transaction.</strong> They were evaluating it as a multi-year financial commitment with real risk, real delay, and real opportunity cost.</p>
+    <p>That distinction changes everything about how the problem should be solved.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ THE PROBLEM ═══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">The Problem</p>
+    <p>Sales activity was happening. Buyers were showing up. But the decision environment was not simple, and the sales infrastructure was not built to address that complexity.</p>
+    <p>High-consideration buyers were not only asking <em>"Do I like this project?"</em> They were running a more difficult mental calculation:</p>
+
+    <ul class="question-list">
+      <li>Is it worth locking capital for years before I see any return?</li>
+      <li>What else could this money do during that time?</li>
+      <li>What happens if the timeline shifts?</li>
+      <li>Does the emotional appeal of this product justify the financial tradeoff?</li>
+      <li>Am I comparing this correctly against liquid alternatives?</li>
+    </ul>
+
+    <p>These are not questions that marketing materials answer. They are questions that require a clear, quantified framework — and in its absence, buyers default to inaction.</p>
+
+    <div class="constraint-block">
+      <div class="constraint-text">"The constraint was not just awareness.<br>It was decision friction."</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ MY ROLE ════════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">My Role</p>
+    <p>I independently analyzed the buyer decision environment, reviewed sales and engagement patterns across the early sales phase, and identified the structural friction between marketing effort and buyer commitment behavior.</p>
+    <p>My contribution was to translate a diffuse performance problem — one that could have been attributed to market conditions, pricing, or simply bad timing — into a clearer and more actionable diagnosis: <strong>the organization was producing demand that the decision environment could not convert.</strong></p>
+    <p>I identified the issue, framed the analysis, and built the thinking that informed a leadership-level reframing of the problem. I did not own the sales strategy or hold final decision-making authority — but I contributed the analytical lens that changed how the problem was understood.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════ KEY INSIGHT ════════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">Key Insight</p>
+    <div class="insight-callout">
+      <p>The buyer was not simply comparing one residence to another. <strong>The buyer was comparing an illiquid, multi-year commitment against flexible alternatives</strong> — liquid investments, continued renting, or simply doing nothing.</p>
+      <p>When you account for capital lockup, opportunity cost on the deposit, ongoing housing costs during the waiting period, timeline uncertainty, and the perceived risk of a development that doesn't yet exist — the calculus for a high-consideration buyer is far more complex than the sales process acknowledged.</p>
+      <p>Emotional marketing addressed desire. It did not address the financial logic that stood between desire and commitment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ WHAT I ANALYZED ══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">What I Analyzed</p>
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Sales activity vs. actual conversion behavior</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Buyer hesitation patterns and engagement drop-off</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Capital lockup and deposit structure risk</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Construction and delivery timeline uncertainty</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Opportunity cost versus liquid investment alternatives</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Ongoing housing costs during the waiting period</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Investor vs. end-user buyer motivation differences</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Value proposition clarity and message-to-decision alignment</div>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-dot"></div>
+        <div class="analysis-text">Marketing activity volume vs. commitment behavior</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ WHAT HAPPENED AFTER ════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">What Happened After</p>
+    <p>Later sales activity continued to support the original insight. Strong marketing output — events, traffic, engagement — did not automatically create proportional sales velocity. The pipeline remained active, but commitment behavior lagged the level of promotional investment.</p>
+    <p>This reinforced that the issue was not simply promotion or awareness. Increasing volume did not resolve the underlying friction. The buyers who were engaging were not lacking information about the project — they were lacking a clear framework for evaluating whether the financial commitment was justified.</p>
+    <div class="insight-callout">
+      <p><strong>"The constraint was structural, not promotional."</strong></p>
+    </div>
+    <p>That conclusion is what shaped the next step.</p>
+  </div>
+</section>
+
+<!-- ══════════════════ HOW THIS LED TO THE TOOL ══════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">How This Led to the Buyer Decision Model</p>
+    <p>This case study became the strategic foundation for a separate interactive project: the <strong>Buyer Decision Model</strong>.</p>
+    <p>The original business analysis identified that buyers were running a complex, multi-variable financial calculation — implicitly, imprecisely, and without any tools to help them do it clearly. The solution was to make that hidden math visible.</p>
+    <p>The tool was built to allow users to test real assumptions around purchase price, deposit structure, construction timeline, rent costs, investment return alternatives, appreciation scenarios, and deal strength — producing a clear, quantified output that either confirms or challenges the decision.</p>
+    <p>It is not a sales tool. It is a decision clarity tool — one that came directly from understanding where and why buyers were stalling.</p>
+
+    <div class="companion-card" style="margin-top: 32px;">
+      <div>
+        <div class="companion-label">Companion Project</div>
+        <div class="companion-title">Buyer Decision Model</div>
+        <div class="companion-desc">The interactive tool built from this analysis — allowing users to model capital lockup, opportunity cost, timeline risk, and deal strength in real time.</div>
+      </div>
+      <a href="https://jamieiha1111.github.io/buyer-decision-model-pre-construction-real-estate-portfolio/" class="btn" target="_blank" rel="noopener">View the separate tool case study ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ BUSINESS IMPACT ══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">Business Impact</p>
+    <p>This work reframed the core problem from <em>"how do we market harder?"</em> to <em>"how do we reduce decision friction and clarify the value proposition?"</em> — a meaningful distinction with different strategic implications.</p>
+    <div class="impact-list">
+      <div class="impact-item">
+        <div class="impact-icon">◆</div>
+        <div class="impact-text"><strong>Revenue operations:</strong> Identified the gap between pipeline activity and committed revenue — a distinction that matters for forecasting and resource allocation.</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-icon">◆</div>
+        <div class="impact-text"><strong>Sales enablement:</strong> Provided a framework for understanding why well-qualified prospects were not converting — enabling more targeted intervention.</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-icon">◆</div>
+        <div class="impact-text"><strong>Pricing strategy:</strong> Surfaced the relationship between incentive structure and buyer risk perception — informing how value propositions are constructed.</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-icon">◆</div>
+        <div class="impact-text"><strong>Product and customer decision tools:</strong> Translated analytical findings into a reusable interactive tool applicable to any high-consideration purchase journey.</div>
+      </div>
+      <div class="impact-item">
+        <div class="impact-icon">◆</div>
+        <div class="impact-text"><strong>Executive communication:</strong> Delivered a structured, evidence-based diagnosis that changed how leadership understood the performance gap.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ WHAT THIS SHOWS ══════════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">What This Shows</p>
+    <div class="skills-grid">
+      <span class="skill-tag">Revenue problem diagnosis</span>
+      <span class="skill-tag">Systems thinking</span>
+      <span class="skill-tag">Sales funnel analysis</span>
+      <span class="skill-tag">Buyer psychology</span>
+      <span class="skill-tag">Financial decision modeling</span>
+      <span class="skill-tag">UX research</span>
+      <span class="skill-tag">Product thinking</span>
+      <span class="skill-tag">Executive communication</span>
+      <span class="skill-tag">Turning ambiguity into frameworks</span>
+      <span class="skill-tag">High-consideration purchase strategy</span>
+      <span class="skill-tag">Operator-level problem framing</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ STRATEGIC TAKEAWAY ═══════════════════════ -->
+<section>
+  <div class="container">
+    <p class="section-label">Strategic Takeaway</p>
+    <div class="takeaway">
+      <p>In high-value purchases, conversion is not only driven by awareness or desire. Buyers need a clear reason to accept risk, illiquidity, delay, and opportunity cost — and the absence of that clarity creates friction that no amount of promotional activity resolves.</p>
+      <p style="margin-top: 16px;">The strongest sales systems do not just generate demand. <strong>They reduce decision friction.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ FOOTER ════════════════════════════ -->
+<footer>
+  <div class="container">
+    <p>© Jamie Iha — Portfolio Case Study</p>
+  </div>
+</footer>
+
+</body>
+</html>
